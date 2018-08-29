@@ -17,14 +17,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
+  // DBHelper.fetchNeighborhoods((error, neighborhoods) => {
+  //   if (error) { // Got an error
+  //     console.error(error);
+  //   } else {
+  //     self.neighborhoods = neighborhoods;
+  //     fillNeighborhoodsHTML();
+  //   }
+  // });
+  DataManager.getNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    }
-  });
+          console.error(error);
+        } else {
+          self.neighborhoods = neighborhoods;
+          fillNeighborhoodsHTML();
+        }
+  })
 }
 
 /**
@@ -44,7 +52,15 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
+  // DBHelper.fetchCuisines((error, cuisines) => {
+  //   if (error) { // Got an error!
+  //     console.error(error);
+  //   } else {
+  //     self.cuisines = cuisines;
+  //     fillCuisinesHTML();
+  //   }
+  // });
+  DataManager.getCuisines((error, cuisines) => {
     if (error) { // Got an error!
       console.error(error);
     } else {
@@ -115,7 +131,15 @@ updateRestaurants = () => {
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+  // DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+  //   if (error) { // Got an error!
+  //     console.error(error);
+  //   } else {
+  //     resetRestaurants(restaurants);
+  //     fillRestaurantsHTML();
+  //   }
+  // })
+  DataManager.getRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
       console.error(error);
     } else {
@@ -207,9 +231,19 @@ createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
+  // restaurants.forEach(restaurant => {
+  //   // Add marker to the map
+  //   const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
+  //   marker.on("click", onClick);
+
+  //   function onClick() {
+  //     window.location.href = marker.options.url;
+  //   }
+  //   self.markers.push(marker);
+  // });
   restaurants.forEach(restaurant => {
     // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
+    const marker = DataManager.mapMarkerForRestaurant(restaurant, self.newMap);
     marker.on("click", onClick);
 
     function onClick() {
@@ -217,7 +251,6 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     }
     self.markers.push(marker);
   });
-
 }
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
