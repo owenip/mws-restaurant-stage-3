@@ -337,12 +337,12 @@ img {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  padding: 0%;
-  align-items: center;
-  max-width: 50%;
+  padding: 0%;  
 }
 
 #review-form {
+  max-width: 100%;
+  margin: 0 1rem;
 }
 
 #review-author,  #review-comments{
@@ -389,5 +389,10 @@ img {
 @media screen and (min-width: 981px) {
   .restaurant-card {
     flex: 0 1 calc(30% - 1em);
+  }
+
+  #review-form {
+    max-width: 80%;
+    margin: 0 10%;
   }
 }
