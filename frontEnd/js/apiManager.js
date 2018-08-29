@@ -122,7 +122,15 @@ class DataManager {
                 localStorage.setItem('idbLastUpdated', new Date().getTime());
                 //Fetch API then store at IDB                    
                 ApiManager.fetchWithServer(protocol, (error, data) => {
-                    DataManager.update(protocol.targetType, data);
+                    DataManager.openDbPromise(protocol.targetType).then( db => {
+                        let tx = db.transaction(protocol.targetType, 'readwrite');
+                        let store = tx.objectStore(protocol.targetType);
+
+                        data.forEach( object => {
+                            store.put(object);
+                        })
+                        return data;
+                    }).then((data) => callback(null, data));
                 });
 
             }
