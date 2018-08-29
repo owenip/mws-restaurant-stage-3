@@ -1,7 +1,7 @@
 const port = 1337; //Server Port
 const UrlToRestaurants = `//localhost:${port}/restaurants`;
 const UrlToReviews = `//localhost:${port}/reviews`;
-const cacheRefreshInterval = 500;
+const cacheRefreshInterval = 10;
 var testReviewProtocol = {
     action: "getAllReviews",
     targetType: "reviews"
@@ -10,7 +10,7 @@ class ApiManager {
     static fetchWithServer(protocol, callback) {
         // Check if online
         if (!navigator.onLine && (protocol.action === 'addReview')) {
-            DataManager.sendDataWhenOnline(protocol);
+            DataManager.updateDataWhenOnline(protocol);
             return;
         }
 
@@ -36,7 +36,20 @@ class ApiManager {
                 input = `${UrlToReviews}/?restaurant_id=${protocol.targetObjId}`;
                 break;
             case 'addReview':
+                input = UrlToReviews;
+
+                let review = {
+                    'name': protocol.data[0],
+                    'rating': parseInt(protocol.data[1]),
+                    'comments': protocol.data[2],
+                    'restaurant_id': parseInt(protocol.data[3])
+                };
+                
                 init.method = 'POST';
+                init.body = JSON.stringify(review);
+                init.headers = new Headers({
+                    'Content-Type': 'application/json'
+                })
                 break;
         }
 
@@ -89,8 +102,9 @@ class DataManager {
 
                     //Update local copy if exceed last update
                     let idbLastUpdated = localStorage.getItem('idbLastUpdated');
-                    if (!idbLastUpdated || (idbLastUpdated - new Date()) / 1000 > cacheRefreshInterval) {
-                        localStorage.setItem('idbLastUpdated', new Date());
+                    let diff = idbLastUpdated - new Date().getTime();
+                    if (!idbLastUpdated || (diff) / 1000 < cacheRefreshInterval) {
+                        localStorage.setItem('idbLastUpdated', new Date().getTime());
                         //fetch new data from server
                         ApiManager.fetchWithServer(protocol, (error, data) => {
                             DataManager.update(protocol.targetType, data);
@@ -99,9 +113,7 @@ class DataManager {
                 } else {
                     //Fetch API then store at IDB                    
                     ApiManager.fetchWithServer(protocol, (error, data) => {
-                        localStorage.setItem('idbLastUpdated', new Date());
-
-
+                        localStorage.setItem('idbLastUpdated', new Date().getTime());
                         DataManager.update(protocol.targetType, data);
                         return data;
 
@@ -152,11 +164,23 @@ class DataManager {
 
         window.addEventListener('online', (event) => {
 
-            let data = JSON.parse(localStorage.getItem('data'));
+            let data = JSON.parse(localStorage.getItem('OfflineData'));
             if (data !== null) {
                 console.log(data);
+                ApiManager.fetchWithServer(protocol, (error, data) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        DataManager.update(protocol.targetType, data);
+                        console.log(data);                        
+                    }
+                });
+                console.log('Offline data uploaded');
 
+                localStorage.removeItem('OfflineData');
+                console.log('Offline data cleared');
             }
+            console.log('Online');
         });
     }
 
@@ -298,7 +322,20 @@ class DataManager {
     }
 
     static addReview(review) {
+        let protocol = {
+            targetType: 'reviews',
+            action: 'addReview',
+            data: review
+        };
 
+        ApiManager.fetchWithServer(protocol, (error, data) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                console.log("review uploaded");
+            }
+        });
+        
 	}
 
     /**
