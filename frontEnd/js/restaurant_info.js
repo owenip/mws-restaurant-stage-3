@@ -30,7 +30,7 @@ initMap = () => {
         id: 'mapbox.streets'
       }).addTo(newMap);
       fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
+      DataManager.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
 }
@@ -64,10 +64,9 @@ fetchRestaurantFromURL = (callback) => {
     error = 'No restaurant id in URL'
     callback(error, null);
   } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
+    DataManager.getRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
       if (!restaurant) {
-        console.error(error);
         return;
       }
       fillRestaurantHTML();
@@ -89,7 +88,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
 
-  const imageDefaultSrc = DBHelper.imageUrlForRestaurant(restaurant);
+  const imageDefaultSrc = DataManager.imageUrlForRestaurant(restaurant);
   const imageParts = imageDefaultSrc.split('.');
 
   const imageSmall = imageParts[0] + '-480_small.' + imageParts[1];
@@ -108,7 +107,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  fetchRestaurantReview();
 }
 
 /**
@@ -129,6 +128,14 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 
     hours.appendChild(row);
   }
+}
+
+//Fetch reviews via DateManager
+fetchRestaurantReview = () => {
+  DataManager.getReviewsByRestaurantId(self.restaurant.id, (error, reviews) => {
+    self.restaurant.reviews = reviews;
+    fillReviewsHTML();
+  })
 }
 
 /**
@@ -170,7 +177,15 @@ createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.className = 'review-card-date';
-  date.innerHTML = review.date;
+  
+  //DateTime covert: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+  let displayDate = new Date(review.createdAt);
+  let options = {
+        year: 'numeric', month: 'numeric', day: 'numeric',
+    };
+  displayDate = displayDate.toLocaleDateString('en', options); 
+
+  date.innerHTML = displayDate;
   divCardContent.appendChild(date);
 
   const rating = document.createElement('p');
