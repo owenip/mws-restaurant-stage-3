@@ -98,10 +98,10 @@ class DataManager {
                     ApiManager.fetchFromServer(protocol, (error, data) => {
                         localStorage.setItem('idbLastUpdated', new Date());
 
-                        
+
                         DataManager.update(protocol.targetType, data);
                         return data;
-                        
+
                     });
 
                 }
@@ -138,17 +138,19 @@ class DataManager {
 
     static update(targetType, objects) {
         let dbPromise = idb.open(targetType, 1, (upgradeDB) => {
-            let store = upgradeDB.createObjectStore(store, {keypath: 'id'});
+            let store = upgradeDB.createObjectStore(store, {
+                keypath: 'id'
+            });
         });
 
         dbPromise.then((db) => {
             let tx = db.transaction(targetType, 'readwrite');
             let store = tx.objectStore(targetType);
 
-            objects.forEach( object => {
+            objects.forEach(object => {
                 store.get(object.id)
                     .then(idbObject => {
-                        if(idbObject !== object) {
+                        if (JSON.stringify(idbObject) !== JSON.stringify(object)) {
                             store.put(object);
                             console.log(`Updated ${targetType}: ${object.id}`)
                         }
@@ -156,5 +158,9 @@ class DataManager {
             });
             return tx.complete;
         })
+    }
+
+    static updateDataWhenOnline() {
+
     }
 }
