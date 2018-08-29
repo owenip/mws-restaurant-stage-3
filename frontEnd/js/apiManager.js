@@ -142,8 +142,8 @@ class DataManager {
                 store.put(objects);
                 console.log(`Updated ${targetType}: ${objects.id}`)
             }
-            return tx.complete;
-        })
+            return objects;
+        }).then(data => callback(null, data));
     }
 
     static updateDataWhenOnline(protocol) {
