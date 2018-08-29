@@ -119,13 +119,11 @@ class DataManager {
                     // })
                 }
             } else {
+                localStorage.setItem('idbLastUpdated', new Date().getTime());
                 //Fetch API then store at IDB                    
                 ApiManager.fetchWithServer(protocol, (error, data) => {
-                    localStorage.setItem('idbLastUpdated', new Date().getTime());
                     DataManager.update(protocol.targetType, data);
-                    return data;
-
-                }).then((data) => callback(null, data));
+                });
 
             }
         });

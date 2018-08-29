@@ -181,7 +181,7 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
-  if(!restaurants) updateRestaurants();
+  if(typeof restaurants == 'undefined') updateRestaurants();  
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach((restaurant) => {
     ul.append(createRestaurantHTML(restaurant));
