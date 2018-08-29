@@ -138,6 +138,34 @@ fetchRestaurantReview = () => {
   })
 }
 
+addReview = () => {
+  event.preventDefault();
+  let restaurantId = self.restaurant.id;
+  let name = document.getElementById('review-author').value;
+  let rating;
+  let comments = document.getElementById('review-comments').value;
+
+  rating = document.querySelector('#rating_select option:checked').value;
+  const review = [name, rating, comments, restaurantId];
+
+  DataManager.addReview(review);
+
+  document.getElementById("review-form").reset();
+  
+  const frontEndReview = {
+    restaurant_id: parseInt(review[3]),
+    rating: parseInt(review[1]),
+    name: review[0],
+    comments: review[2].substring(0, 300),
+    createdAt: new Date()
+  };
+
+  const container = document.getElementById('reviews-container');
+  const ul = document.getElementById('reviews-list');
+  ul.appendChild(createReviewHTML(frontEndReview));
+  container.appendChild(ul);
+}
+
 /**
  * Create all reviews HTML and add them to the webpage.
  */

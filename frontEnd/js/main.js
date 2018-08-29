@@ -9,8 +9,19 @@ var markers = []
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added 
-  fetchNeighborhoods();
-  fetchCuisines();
+
+
+  let protocol = {
+    targetType: 'restaurants',
+    action: 'getAllRestaurant'
+  };
+
+  DataManager.fetchData(protocol, (error, data) => {    
+    fetchNeighborhoods();
+    fetchCuisines();
+    updateRestaurants();
+  });
+
 });
 
 /**
@@ -27,11 +38,11 @@ fetchNeighborhoods = () => {
   // });
   DataManager.getNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
-          console.error(error);
-        } else {
-          self.neighborhoods = neighborhoods;
-          fillNeighborhoodsHTML();
-        }
+      console.error(error);
+    } else {
+      self.neighborhoods = neighborhoods;
+      fillNeighborhoodsHTML();
+    }
   })
 }
 
@@ -170,6 +181,7 @@ resetRestaurants = (restaurants) => {
  * Create all restaurants HTML and add them to the webpage.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
+  if(!restaurants) updateRestaurants();
   const ul = document.getElementById('restaurants-list');
   restaurants.forEach((restaurant) => {
     ul.append(createRestaurantHTML(restaurant));

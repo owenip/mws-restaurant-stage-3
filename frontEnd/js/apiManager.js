@@ -2,10 +2,7 @@ const port = 1337; //Server Port
 const UrlToRestaurants = `//localhost:${port}/restaurants`;
 const UrlToReviews = `//localhost:${port}/reviews`;
 const cacheRefreshInterval = 10;
-var testReviewProtocol = {
-    action: "getAllReviews",
-    targetType: "reviews"
-}
+
 class ApiManager {
     static fetchWithServer(protocol, callback) {
         // Check if online
@@ -44,12 +41,14 @@ class ApiManager {
                     'comments': protocol.data[2],
                     'restaurant_id': parseInt(protocol.data[3])
                 };
-                
+
                 init.method = 'POST';
                 init.body = JSON.stringify(review);
                 init.headers = new Headers({
                     'Content-Type': 'application/json'
                 })
+                break;
+            default:
                 break;
         }
 
@@ -59,6 +58,8 @@ class ApiManager {
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.indexOf('application/json') !== -1) {
                     return response.json();
+                } else {
+                    return;
                 }
             })
             .then((data) => {
@@ -94,39 +95,46 @@ class DataManager {
 
     static fetchData(protocol, callback) {
         const dbStorePromise = DataManager.openDbPromise(protocol.targetType);
-        DataManager.getAllDataFromTargetStore(protocol.targetType)
-            .then(data => {
-                if (data.length > 0) {
-                    console.log("Fetch data from IDB");
-                    callback(null, data);
+        // DataManager.getAllDataFromTargetStore(protocol.targetType)
+        dbStorePromise.then(db => {
+            let tx = db.transaction(protocol.targetType);
+            let store = tx.objectStore(protocol.targetType);
+            return store.getAll();
+        }).then(data => {
+            if (data.length > 0) {
+                console.log("Fetch data from IDB");
+                callback(null, data);
 
-                    //Update local copy if exceed last update
-                    let idbLastUpdated = localStorage.getItem('idbLastUpdated');
-                    let diff = idbLastUpdated - new Date().getTime();
-                    if (!idbLastUpdated || (diff) / 1000 < cacheRefreshInterval) {
-                        localStorage.setItem('idbLastUpdated', new Date().getTime());
-                        //fetch new data from server
-                        ApiManager.fetchWithServer(protocol, (error, data) => {
-                            DataManager.update(protocol.targetType, data);
-                        });
-                    }
-                } else {
-                    //Fetch API then store at IDB                    
+                //Update local copy if exceed last update
+                let idbLastUpdated = localStorage.getItem('idbLastUpdated');
+                let diff = idbLastUpdated - new Date().getTime();
+                if (!idbLastUpdated || (diff) / 1000 < cacheRefreshInterval) {
+                    localStorage.setItem('idbLastUpdated', new Date().getTime());
+                    //fetch new data from server
                     ApiManager.fetchWithServer(protocol, (error, data) => {
-                        localStorage.setItem('idbLastUpdated', new Date().getTime());
                         DataManager.update(protocol.targetType, data);
-                        return data;
-
                     });
+                    // ApiManager.fetchWithServer(protocol, (error, data) => {
 
+                    // })
                 }
-            });
+            } else {
+                //Fetch API then store at IDB                    
+                ApiManager.fetchWithServer(protocol, (error, data) => {
+                    localStorage.setItem('idbLastUpdated', new Date().getTime());
+                    DataManager.update(protocol.targetType, data);
+                    return data;
+
+                }).then((data) => callback(null, data));
+
+            }
+        });
     }
 
     static getAllDataFromTargetStore(targetStore) {
         return DataManager.openDbPromise(targetStore).then(db => {
-                return db.transaction(targetStore).objectStore(targetStore).getAll();
-            });
+            return db.transaction(targetStore).objectStore(targetStore).getAll();
+        });
     }
 
     static update(targetType, objects) {
@@ -155,7 +163,7 @@ class DataManager {
                 console.log(`Updated ${targetType}: ${objects.id}`)
             }
             return objects;
-        }).then(data => callback(null, data));
+        });
     }
 
     static updateDataWhenOnline(protocol) {
@@ -172,7 +180,7 @@ class DataManager {
                         console.log(error);
                     } else {
                         DataManager.update(protocol.targetType, data);
-                        console.log(data);                        
+                        console.log(data);
                     }
                 });
                 console.log('Offline data uploaded');
@@ -265,7 +273,7 @@ class DataManager {
             }
         });
     }
-    
+
     static getNeighborhoods(callback) {
         let protocol = {
             targetType: 'restaurants',
@@ -335,8 +343,8 @@ class DataManager {
                 console.log("review uploaded");
             }
         });
-        
-	}
+
+    }
 
     /**
      * Restaurant page URL.
@@ -356,7 +364,7 @@ class DataManager {
      * Map marker for a restaurant.
      */
     static mapMarkerForRestaurant(restaurant, map) {
-    // https://leafletjs.com/reference-1.3.0.html#marker  
+        // https://leafletjs.com/reference-1.3.0.html#marker  
         const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng], {
             title: restaurant.name,
             alt: restaurant.name,
