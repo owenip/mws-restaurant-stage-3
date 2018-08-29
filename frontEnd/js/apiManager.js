@@ -7,7 +7,7 @@ var testReviewProtocol = {
     targetType: "reviews"
 }
 class ApiManager {
-    static fetchFromServer(protocol, callback) {
+    static fetchWithServer(protocol, callback) {
         // Check if online
         if (!navigator.onLine && (protocol.action === 'addReview')) {
             DataManager.sendDataWhenOnline(protocol);
@@ -89,13 +89,13 @@ class DataManager {
                     if (!idbLastUpdated || (idbLastUpdated - new Date()) / 1000 > cacheRefreshInterval) {
                         localStorage.setItem('idbLastUpdated', new Date());
                         //fetch new data from server
-                        ApiManager.fetchFromServer(protocol, (error, data) => {
+                        ApiManager.fetchWithServer(protocol, (error, data) => {
                             DataManager.update(protocol.targetType, data);
                         });
                     }
                 } else {
                     //Fetch API then store at IDB                    
-                    ApiManager.fetchFromServer(protocol, (error, data) => {
+                    ApiManager.fetchWithServer(protocol, (error, data) => {
                         localStorage.setItem('idbLastUpdated', new Date());
 
 
@@ -106,27 +106,6 @@ class DataManager {
 
                 }
             });
-
-
-        let idbLastUpdated = localStorage.getItem('idbLastUpdated');
-        if (!idbLastUpdated || (idbLastUpdated - new Date()) / 1000 > cacheRefreshInterval) {
-            //TODO: fetch online
-        } else {
-            //Fetch from local cache
-            localStorage.setItem('idbLastUpdated', new Date());
-            const dbStorePromise = DataManager.openDbPromise(protocol.targetType);
-            DataManager.getAllDataFromTargetStore(protocol.targetType)
-                .then(data => {
-                    if (data.length > 0) {
-                        console.log("Fetch data from IDB");
-                        callback(null, data);
-                    }
-                })
-                .then((data) => {
-                    callback(null, data);
-                });
-        }
-
     }
 
     static getAllDataFromTargetStore(targetStore) {
@@ -147,20 +126,79 @@ class DataManager {
             let tx = db.transaction(targetType, 'readwrite');
             let store = tx.objectStore(targetType);
 
-            objects.forEach(object => {
-                store.get(object.id)
-                    .then(idbObject => {
-                        if (JSON.stringify(idbObject) !== JSON.stringify(object)) {
-                            store.put(object);
-                            console.log(`Updated ${targetType}: ${object.id}`)
-                        }
-                    })
-            });
+            if (typeof objects == Array) {
+                objects.forEach(object => {
+                    store.get(object.id)
+                        .then(idbObject => {
+                            if (JSON.stringify(idbObject) !== JSON.stringify(object)) {
+                                store.put(object);
+                                console.log(`Updated ${targetType}: ${object.id}`)
+                            }
+                        })
+                });
+            } else {
+                store.put(objects);
+                console.log(`Updated ${targetType}: ${objects.id}`)
+            }
             return tx.complete;
         })
     }
 
-    static updateDataWhenOnline() {
+    static updateDataWhenOnline(protocol) {
+        localStorage.setItem('OfflineData', JSON.stringify(protocol));
+        console.log(`${protocol.data} is saved to OfflineData at LocalStorage`);
 
+        window.addEventListener('online', (event) => {
+
+            let data = JSON.parse(localStorage.getItem('data'));
+            if (data !== null) {
+                console.log(data);
+
+            }
+        });
+    }
+
+    static getRestaurantById(id, callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getRestaurantById',
+            targetObjId: id
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error || restaurants.length <= 0) {
+                callback(error, null);
+            } else {
+                const restaurant = restaurants.find(r => r.id == id);
+                if (restaurant) { // Got the restaurant
+                    callback(null, restaurant);
+                } else { // Restaurant does not exist in the database
+                    callback('Restaurant does not exist', null);
+                }
+            }
+
+        });
+    }
+
+    static getRestaurantByCusineAndNeighborhood(cuisine, neighborhood, callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getAllRestaurant'
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                let results = restaurants;
+                if (cuisine != 'all') { // filter by cuisine
+                    results = results.filter(r => r.cuisine_type == cuisine);
+                }
+                if (neighborhood != 'all') { // filter by neighborhood
+                    results = results.filter(r => r.neighborhood == neighborhood);
+                }
+                callback(null, results);
+            }
+        });
     }
 }

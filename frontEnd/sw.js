@@ -7,6 +7,7 @@ var urlsToCache = [
     './js/dbhelper.js',
     './js/idb.js',
     './js/idbhelper.js',
+    './js/apiManager.js',
     './js/main.js',
     './js/restaurant_info.js',
     './img/1-800_medium.jpg',
