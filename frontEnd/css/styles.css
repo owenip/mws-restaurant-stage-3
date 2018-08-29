@@ -1,0 +1,344 @@
+@charset "utf-8";
+/* CSS Document */
+
+html,
+body {
+  margin: 0;
+  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  margin: 0;
+  max-width: 1024px;
+  position: relative;
+  margin: 0 auto;
+}
+
+/* wrapper: wrap all items that is inside body tag*/
+
+.wrapper {
+  background-color: #f3f3f3;
+  margin: 0% auto;
+  padding: 0%;
+  display: flex;
+  flex-flow: row wrap;
+  min-width: 360px;
+}
+
+/* make wrapper children to be 100% width. */
+
+.wrapper>* {
+  flex: 1 100%;
+  max-width: 100%;
+}
+
+/* Prevent images overflowing the viewport */
+
+img {
+  max-width: 100%;
+}
+
+/* ====================== Navigation Bar ====================== */
+
+.nav {
+  align-items: center;
+  background-color: #252831;
+  display: flex;
+  width: 100%;
+  height: 4rem;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.nav-title {
+  color: #fff;
+  font-size: 1.25rem;
+  letter-spacing: 0.5rem;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.nav-title:hover,
+.nav-title:focus {
+  font-weight: 1.0rem;
+  letter-spacing: 0.65rem;
+}
+
+/* Make sure the Title is large enough to be tapped on screen */
+
+.nav a {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* ====================== Breadcrumbs ====================== */
+
+.breadcrumbs {
+  align-items: center;
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0;
+  min-width: 48px;
+  min-height: 52px;
+  padding-left: 1rem;
+}
+
+#breadcrumb {
+  list-style: none;
+  font-weight: 300;
+  background-color: #eee;
+}
+
+/* Display list items side by side */
+
+#breadcrumb li {
+  display: inline;
+}
+
+/* Add a slash symbol (/) before/behind each list item */
+
+#breadcrumb li+li:before {
+  padding: 0.5rem;
+  color: black;
+  content: "/\00a0";
+}
+
+/* Add a color to all links inside the list */
+
+#breadcrumb li a {
+  color: #0275d8;
+  text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+
+#breadcrumb li a:hover {
+  color: #01447e;
+  text-decoration: underline;
+}
+
+/* ====================== Map ====================== */
+
+.maps {
+  width: 100%;
+  height: 50vh;
+}
+
+/* ====================== Restaurant Filtering ====================== */
+
+.restaurant-filter {
+  align-items: center;
+  background-color: #252831;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding: 0.25rem;
+}
+
+.restaurant-filter h2 {
+  color: #fff;
+  line-height: 1;
+  margin: 0 10px;
+  width: 100%;
+  flex: 0 1 100%;
+}
+
+.restaurant-filter select {
+  background-color: #fff;
+  border: 1px solid #000000;
+  font-size: 1rem;
+  width: calc(50% - 1em);
+  height: 1.75rem;
+}
+
+/* ====================== Restaurant Listing ====================== */
+
+#restaurants-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  list-style: outside none none;
+  margin: 0;
+  padding: 30px 15px 60px;
+  text-align: center;
+  justify-content: center;
+}
+
+.restaurant-card {
+  background-color: #fff;
+  border: 2px solid #ccc;
+  margin: 0.5rem;
+  text-align: left;
+}
+
+.card-img {
+  background-color: #ccc;
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  min-height: 248px;
+  min-width: 100%;
+}
+
+.card-title,
+.card-textArea {
+  padding: 0.5rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.0125em;
+  height: 3rem;
+  display: flex;
+}
+
+#restaurants-list p {
+  margin: 0;
+  font-size: 11pt;
+}
+
+.card-action {
+  align-items: center;
+  background-color: #252831;
+  border-bottom: 3px solid #eee;
+  color: #fff;
+  display: flex;
+  flex-direction: row;
+  margin: 15px 0 0;
+  padding: 0.5rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* ====================== Restaurant Details ====================== */
+
+.restaurant-details-container {
+  margin: 0;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.restaurant-details-title {
+  width: 100%;
+  margin: 0 0 0.5rem 0;
+}
+
+.restaurant-details-img {
+  background-color: #ccc;
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  min-height: 248px;
+  min-width: 100%;
+}
+
+.restaurant-details-cuisine {
+  width: auto;
+  background-color: #252831;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0;
+  margin-bottom: 1rem;
+}
+
+.restaurant-details-cuisine-content {
+  color: #eee;
+  text-align: center;
+  font-weight: 300;
+  margin: 0%;
+}
+
+.restaurant-details-addressAndMap {
+  font-weight: 700;
+}
+
+.restaurant-details-map {
+  width: 100%;
+  min-height: 25vh;
+  flex: 1;
+}
+
+.restaurant-details-openingHours {
+  font-weight: 500;
+  margin: 0.5rem;
+}
+
+#restaurant-hours {
+  margin: 1rem auto;
+}
+
+/* ====================== Restaurant Review===============*/
+.reviews-container {
+  padding: 0.5rem;
+}
+
+.review-container-title {
+  color: #01447e;
+}
+
+.review-cards {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0%;
+  justify-content: space-between;
+}
+
+.review-card {
+  border-radius: 1em;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  margin: 0.5rem auto;
+  width: 100%;
+}
+
+.review-card-content {
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.review-card-reviewerName {
+  font-weight: 600;
+  flex: 0 0 50%;
+}
+
+.review-card-date {
+  width: 50%;
+  text-align: right;
+  flex: 0 0 50%;
+}
+
+.review-card-rating {
+  margin: 0%;
+  flex: 0 1 100%;  
+}
+
+/* ====================== Breakpoints ====================== */
+
+@media screen and (min-width: 481px) and (max-width: 980px) {
+  .restaurant-card {
+    flex: 0 1 calc(48% - 1em);
+  }
+}
+
+@media screen and (min-width: 981px) {
+  .restaurant-card {
+    flex: 0 1 calc(30% - 1em);
+  }
+}

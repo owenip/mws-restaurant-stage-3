@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#252831" />
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="img/icons/dish512.png" />
+  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin="" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <title>Restaurant Reviews</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <nav class="nav">
+        <h1>
+          <a class="nav-title" href="/">Restaurant Reviews</a>
+        </h1>
+      </nav>
+    </header>
+
+    <main id="maincontent">
+      <section id="map-container">
+        <div id="map" class="maps" aria-label="Overview Map of listed restaurants"></div>
+      </section>
+      <section>
+        <div class="restaurant-filter">
+          <h2>Filter Results</h2>
+          <select id="neighborhoods-select" name="neighborhoods" aria-label="Select Neighborhood" onchange="updateRestaurants()">
+            <option value="all">All Neighborhoods</option>
+          </select>
+          <select id="cuisines-select" name="cuisines" aria-label="Select Cusisine" onchange="updateRestaurants()">
+            <option value="all">All Cuisines</option>
+          </select>
+        </div>
+        <ul id="restaurants-list"></ul>
+      </section>
+    </main>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').then(function (registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function (err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+      crossorigin=""></script>
+    <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
+    <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>
+    <script type="application/javascript" charset="utf-8" src="js/idbhelper.js"></script>
+    <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script> -->
+
+    <footer id="footer">
+      Copyright (c) 2017
+      <a href="/">
+        <strong>Restaurant Reviews</strong>
+      </a> All Rights Reserved.
+    </footer>
+  </div>
+</body>
+
+</html>

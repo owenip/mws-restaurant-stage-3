@@ -1,0 +1,24 @@
+{
+    "name": "MWS Restaurant Stage 2 Project",
+    "short_name": "Restaurant App",
+    "start_url": "/",
+    "scope": ".",
+    "display": "standalone",
+    "background_color": "#f3f3f3",
+    "theme_color": "#252831",
+    "description": "Project 2 of Udacity MWS Nanodegree",
+    "lang": "en-US",
+    "orientation": "portrait-primary",
+    "icons": [
+      {
+        "src": "/img/icons/dish256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      },
+      {
+        "src": "/img/icons/dish512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ]
+  }
