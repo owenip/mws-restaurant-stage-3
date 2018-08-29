@@ -32,6 +32,9 @@ class ApiManager {
             case 'getReviewsById':
                 input = `${UrlToReviews}/${protocol.targetObjId}`;
                 break;
+            case 'getReviewsByRestaurantID':
+                input = `${UrlToReviews}/?restaurant_id=${protocol.targetObjId}`;
+                break;
             case 'addReview':
                 init.method = 'POST';
                 break;
@@ -125,7 +128,7 @@ class DataManager {
             let tx = db.transaction(targetType, 'readwrite');
             let store = tx.objectStore(targetType);
 
-            if (typeof objects == Array) {
+            if (Array.isArray(objects)) {
                 objects.forEach(object => {
                     store.get(object.id)
                         .then(idbObject => {
@@ -239,4 +242,58 @@ class DataManager {
         });
     }
     
+    static getNeighborhoods(callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getAllRestaurant'
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                // Get all neighborhoods from all restaurants
+                const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+                // Remove duplicates from neighborhoods
+                const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
+                callback(null, uniqueNeighborhoods);
+            }
+        });
+    }
+
+    static getCuisines(callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getAllRestaurant'
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                // Get all cuisines from all restaurants
+                const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+                // Remove duplicates from cuisines
+                const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+                callback(null, uniqueCuisines);
+            }
+        });
+    }
+
+    static getReviewsByRestaurantId(restaurantId, callback) {
+        let protocol = {
+            targetType: 'reviews',
+            targetObjId: restaurantId,
+            action: 'getReviewsByRestaurantID'
+        };
+
+        DataManager.fetchData(protocol, (error, reviews) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                const results = reviews.filter(r => r.restaurant_id === restaurantId);
+                callback(null, results);
+            }
+        });
+    }
 }
