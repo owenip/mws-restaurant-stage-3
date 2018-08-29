@@ -109,8 +109,7 @@ class DataManager {
     }
 
     static getAllDataFromTargetStore(targetStore) {
-        return DataManager.openDbPromise(targetStore)
-            .then(db => {
+        return DataManager.openDbPromise(targetStore).then(db => {
                 return db.transaction(targetStore).objectStore(targetStore).getAll();
             });
     }
@@ -180,7 +179,7 @@ class DataManager {
         });
     }
 
-    static getRestaurantByCusineAndNeighborhood(cuisine, neighborhood, callback) {
+    static getRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
         let protocol = {
             targetType: 'restaurants',
             action: 'getAllRestaurant'
@@ -201,4 +200,43 @@ class DataManager {
             }
         });
     }
+
+    static getRestaurantByCuisine(cuisine, callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getAllRestaurant'
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                let results = restaurants;
+                if (cuisine != 'all') { // filter by cuisine
+                    results = results.filter(r => r.cuisine_type == cuisine);
+                }
+                callback(null, results);
+            }
+        });
+    }
+
+    static getRestaurantByNeighborhood(neighborhood, callback) {
+        let protocol = {
+            targetType: 'restaurants',
+            action: 'getAllRestaurant'
+        };
+
+        DataManager.fetchData(protocol, (error, restaurants) => {
+            if (error) {
+                callback(error, null);
+            } else {
+                let results = restaurants;
+                if (neighborhood != 'all') { // filter by neighborhood
+                    results = results.filter(r => r.neighborhood == neighborhood);
+                }
+                callback(null, results);
+            }
+        });
+    }
+    
 }
